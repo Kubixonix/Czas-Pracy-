@@ -22,18 +22,24 @@ html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
 button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2px}
-#app{height:100%;display:flex;flex-direction:column;padding:16px 16px 14px;max-width:520px;margin:0 auto}
+#bg{position:fixed;inset:0;z-index:0;background:radial-gradient(120% 80% at 50% 0%,#2a1606 0%,var(--bg) 70%)}
+#bgp{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .9s}
+#bgp.on{opacity:1}
+#bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,9,7,.85) 0%,rgba(11,9,7,.4) 32%,rgba(11,9,7,.45) 62%,rgba(11,9,7,.94) 100%)}
+#app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:16px 16px 14px;max-width:520px;margin:0 auto}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .depts{display:flex;gap:8px}
-.dp{width:58px;height:58px;border-radius:50%;border:2px solid var(--c);font-weight:600;font-size:15px;color:var(--c);transition:.15s}
+.dp{width:58px;height:58px;border-radius:50%;border:2px solid var(--c);font-weight:600;font-size:15px;color:var(--c);background:rgba(11,9,7,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:.15s}
 .dp.on{background:var(--c);color:#111}
 .dp:disabled{opacity:.3}
 .dp.on:disabled{opacity:1}
 .clock{text-align:right;min-width:0}
 #ck-t{font:600 26px 'Barlow Condensed',sans-serif;letter-spacing:.5px;font-variant-numeric:tabular-nums}
-#ck-d{font-size:12.5px;color:var(--mut);margin-top:1px}
-.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;min-height:0}
-.go{width:min(72vw,40vh,290px);aspect-ratio:1;border-radius:50%;border:6px solid var(--ac);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:background .2s,transform .1s}
+#ck-d{font-size:12.5px;color:#e2d9cc;margin-top:1px}
+.clock{text-shadow:0 1px 8px #000}
+.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:0}
+.go{margin-bottom:10px}
+.go{width:min(72vw,40vh,290px);aspect-ratio:1;border-radius:50%;border:6px solid var(--ac);background:rgba(11,9,7,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:background .2s,transform .1s}
 .go:active{transform:scale(.97)}
 #go-l{font:600 40px 'Barlow Condensed',sans-serif;letter-spacing:3px}
 #go-t{font:500 30px 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums;color:var(--mut);height:34px}
@@ -43,9 +49,10 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,106,0,.55)}50%{box-shadow:0 0 0 18px rgba(255,106,0,0)}}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @media(prefers-reduced-motion:reduce){.go.run,.go.shake{animation:none}.panel{animation:none!important}}
-#stat{margin:0;font-size:14.5px;color:var(--mut);text-align:center;min-height:20px}
+#stat{margin:0;font-size:14.5px;color:var(--tx);text-align:center;min-height:20px;text-shadow:0 1px 8px #000}
+.lnk{font-size:12.5px;color:#e2d9cc;text-decoration:underline;text-underline-offset:3px;padding:8px 12px;text-shadow:0 1px 8px #000;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bot{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.nb{background:var(--s1);border:1px solid var(--ln);border-radius:18px;min-height:88px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;line-height:1.2;text-align:center;font-weight:500}
+.nb{background:rgba(22,18,14,.84);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--ln);border-radius:18px;min-height:88px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;line-height:1.2;text-align:center;font-weight:500}
 .nb:active{background:var(--s2)}
 .nb svg{width:26px;height:26px;fill:none;stroke:var(--ac);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10;display:flex;align-items:flex-end;justify-content:center}
@@ -99,6 +106,7 @@ input.in{width:100%;height:48px;border-radius:12px;border:1px solid var(--ln);ba
 </style>
 </head>
 <body>
+<div id="bg"><div id="bgp"></div></div>
 <div id="app">
   <header class="top">
     <div class="depts" id="depts"></div>
@@ -107,6 +115,7 @@ input.in{width:100%;height:48px;border-radius:12px;border:1px solid var(--ln);ba
   <main class="mid">
     <button class="go" id="go" data-a="go"><span id="go-l">START</span><span id="go-t"></span></button>
     <p id="stat"></p>
+    <button class="lnk" id="lnk" data-a="open:s"></button>
   </main>
   <nav class="bot">
     <button class="nb" data-a="open:m"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Wybór miesiąca</button>
@@ -209,12 +218,12 @@ function viewE(){
   <input class="in" id="rate" inputmode="decimal" value="${String(S.rate).replace('.',',')}" autocomplete="off">
   <p class="mut" style="margin:10px 0 0;line-height:1.4">Student do 26. roku życia: netto = brutto. Minimalna stawka godzinowa: 31,40 zł w 2026 r., od 1 stycznia 2027 r. 32,30 zł.</p></div>`;
 }
-const TITLES={m:'Wybór miesiąca',l:'Godziny w miesiącu',e:'Ile zarobiłem'};
+const TITLES={m:'Wybór miesiąca',l:'Godziny w miesiącu',e:'Ile zarobiłem',s:'Tło aplikacji'};
 function renderSheet(){
   const sh=$('sheet');
   if(!S.sheet){sh.hidden=true;return}
   const top=$('panel').scrollTop,was=!sh.hidden;
-  $('panel').innerHTML=`<div class="ph"><h2>${TITLES[S.sheet]}</h2><button class="x" data-a="close" aria-label="Zamknij">✕</button></div>`+({m:viewM,l:viewL,e:viewE}[S.sheet])();
+  $('panel').innerHTML=`<div class="ph"><h2>${TITLES[S.sheet]}</h2><button class="x" data-a="close" aria-label="Zamknij">✕</button></div>`+({m:viewM,l:viewL,e:viewE,s:viewS}[S.sheet])();
   sh.hidden=false;if(was)$('panel').scrollTop=top;
 }
 function renderDlg(){
@@ -246,6 +255,9 @@ function act(a,v){
       const st=toMs(e.date,e.s);let en=toMs(e.date,e.e);if(en<=st)en+=864e5;
       if(e.id){const s=S.shifts.find(x=>x.id===e.id);Object.assign(s,{dept:e.dept,start:st,end:en})}else S.shifts.push({id:uid(),dept:e.dept,start:st,end:en});
       S.shifts.sort((a,b)=>a.start-b.start);S.month=mk(st);S.edit=null;save();renderDlg();renderSheet();toast('Zapisano');break}
+    case'tsave':{const v=$('tk').value.trim();if(!v){$('tmsg').textContent='Najpierw wklej klucz.';return}S.tmdb=v;try{localStorage.setItem('kino-tmdb',v)}catch(e){}$('tmsg').textContent='Pobieram plakat…';
+      refreshFilm(true).then(()=>{renderSheet();$('tmsg').textContent='Gotowe, plakat ustawiony.'}).catch(()=>{$('tmsg').textContent='Nie udało się. Sprawdź klucz i połączenie z internetem.'});break}
+    case'tclear':S.tmdb='';S.film=null;try{localStorage.removeItem('kino-tmdb');localStorage.removeItem('kino-bg')}catch(e){}$('bgp').classList.remove('on');setLnk();renderSheet();break;
     case'del':if(S.confirm===v){S.shifts=S.shifts.filter(x=>x.id!==v);S.confirm=null;save();renderSheet();toast('Usunięto zmianę')}else{S.confirm=v;renderSheet()}break;
   }
 }
@@ -257,7 +269,34 @@ document.addEventListener('click',e=>{
 document.addEventListener('input',e=>{
   if(e.target.id==='rate'){const v=parseFloat(e.target.value.replace(',','.'));S.rate=isNaN(v)||v<0?0:v;save();$('earn').innerHTML=earnOut()}
 });
-paint();tick();setInterval(tick,1000);
+try{S.tmdb=localStorage.getItem('kino-tmdb')||'';S.film=JSON.parse(localStorage.getItem('kino-bg')||'null')}catch(e){S.tmdb='';S.film=null}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function addDays(ds,n){const[y,m,d]=ds.split('-').map(Number),t=new Date(Date.UTC(y,m-1,d)+n*864e5);return`${t.getUTCFullYear()}-${pad(t.getUTCMonth()+1)}-${pad(t.getUTCDate())}`}
+function weekStart(){const p=P(Date.now()),back=(new Date(Date.UTC(p.y,p.m-1,p.d)).getUTCDay()-4+7)%7;return addDays(ymd(p),-back)}
+function setLnk(){$('lnk').textContent=S.film?`Plakat tygodnia: ${S.film.title}`:'Włącz tło z plakatem tygodnia'}
+function showBg(){if(!S.film)return;const u='https://image.tmdb.org/t/p/w780'+S.film.poster,im=new Image();im.onload=()=>{const b=$('bgp');b.style.backgroundImage=`url(${u})`;b.classList.add('on')};im.src=u}
+async function tm(path,params){const q=new URLSearchParams({language:'pl-PL',...params}),hd={};if(S.tmdb.startsWith('eyJ'))hd.Authorization='Bearer '+S.tmdb;else q.set('api_key',S.tmdb);
+  const r=await fetch('https://api.themoviedb.org/3'+path+'?'+q,{headers:hd});if(!r.ok)throw new Error(r.status);return r.json()}
+async function refreshFilm(force){
+  const ws=weekStart();if(!S.tmdb)return;if(!force&&S.film&&S.film.week===ws)return;
+  let r=await tm('/discover/movie',{region:'PL',with_release_type:'2|3','release_date.gte':ws,'release_date.lte':addDays(ws,6),sort_by:'popularity.desc',include_adult:'false'});
+  let f=(r.results||[]).find(x=>x.poster_path);
+  if(!f){r=await tm('/movie/now_playing',{region:'PL'});f=(r.results||[]).filter(x=>x.poster_path).sort((a,b)=>b.popularity-a.popularity)[0]}
+  if(!f)throw new Error('brak');
+  S.film={id:f.id,title:f.title,poster:f.poster_path,week:ws};try{localStorage.setItem('kino-bg',JSON.stringify(S.film))}catch(e){}
+  setLnk();showBg();
+}
+function viewS(){
+  return`<div class="card"><div class="mut">Plakat tygodnia</div><div class="big" style="font-size:30px;margin-top:6px">${S.film?esc(S.film.title):'brak'}</div>
+  <p class="mut" style="margin:10px 0 0;line-height:1.4">Co czwartek aplikacja wybiera najpopularniejszą premierę kinową tygodnia w Polsce. Jeśli żadnej nie ma, bierze najpopularniejszy film z aktualnego repertuaru.</p></div>
+  <div class="card"><label class="f" for="tk" style="margin-top:0">Klucz TMDB (API Read Access Token lub API Key)</label>
+  <input class="in" id="tk" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(S.tmdb)}" placeholder="wklej klucz">
+  <button class="pri" data-a="tsave" style="margin-top:14px">Zapisz i pobierz plakat</button>
+  <div id="tmsg" class="mut" style="min-height:20px"></div>
+  ${S.tmdb?'<button class="sec" data-a="tclear" style="margin-top:8px">Wyłącz plakat i usuń klucz</button>':''}</div>
+  <div class="card mut" style="line-height:1.5"><b style="color:var(--tx)">Jak zdobyć klucz (raz, za darmo)</b><br>1. Załóż konto na themoviedb.org.<br>2. Ustawienia konta → API → utwórz klucz (typ: Developer).<br>3. Skopiuj „API Read Access Token” i wklej powyżej.<br><br>This product uses the TMDB API but is not endorsed or certified by TMDB.</div>`;
+}
+paint();tick();setInterval(tick,1000);setLnk();showBg();refreshFilm(false).catch(()=>{});
 </script>
 </body>
 </html>
