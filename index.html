@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Czas pracy – kino</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Czas pracy">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
+<style>
+:root{--bg:#0a0a0b;--s1:#151518;--s2:#202026;--ln:#2b2b32;--tx:#f4f4f5;--mut:#8d8d97;--red:#d92d2d;color-scheme:dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#app{height:100%;display:flex;flex-direction:column;padding:16px 16px 14px;max-width:520px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.depts{display:flex;gap:8px}
+.dp{width:58px;height:58px;border-radius:50%;border:2px solid var(--c);font-weight:600;font-size:15px;color:var(--c);transition:.15s}
+.dp.on{background:var(--c);color:#111}
+.dp:disabled{opacity:.3}
+.dp.on:disabled{opacity:1}
+.clock{text-align:right;min-width:0}
+#ck-t{font:600 26px 'Barlow Condensed',sans-serif;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+#ck-d{font-size:12.5px;color:var(--mut);margin-top:1px}
+.mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;min-height:0}
+.go{width:min(72vw,40vh,290px);aspect-ratio:1;border-radius:50%;border:6px solid var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:background .2s,transform .1s}
+.go:active{transform:scale(.97)}
+#go-l{font:600 40px 'Barlow Condensed',sans-serif;letter-spacing:3px}
+#go-t{font:500 30px 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums;color:var(--mut);height:34px}
+.go.run{background:var(--red);animation:pulse 2.4s ease-in-out infinite}
+.go.run #go-t{color:#fff}
+.go.shake{animation:shake .35s}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,45,45,.5)}50%{box-shadow:0 0 0 18px rgba(217,45,45,0)}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media(prefers-reduced-motion:reduce){.go.run,.go.shake{animation:none}.panel{animation:none!important}}
+#stat{margin:0;font-size:14.5px;color:var(--mut);text-align:center;min-height:20px}
+.bot{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.nb{background:var(--s1);border:1px solid var(--ln);border-radius:18px;min-height:88px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;line-height:1.2;text-align:center;font-weight:500}
+.nb:active{background:var(--s2)}
+.nb svg{width:26px;height:26px;fill:none;stroke:var(--red);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.ov[hidden]{display:none}
+.panel{background:var(--bg);width:100%;max-width:520px;height:92%;border-radius:24px 24px 0 0;border:1px solid var(--ln);border-bottom:0;overflow-y:auto;padding:0 16px calc(20px + env(safe-area-inset-bottom,0px));animation:up .22s ease-out;user-select:text}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.ph{position:sticky;top:0;background:var(--bg);display:flex;justify-content:space-between;align-items:center;padding:16px 0 10px;z-index:2}
+.ph h2{margin:0;font-size:20px;font-weight:600}
+.x{width:38px;height:38px;border-radius:50%;background:var(--s2);font-size:18px}
+.mnav{display:flex;align-items:center;justify-content:space-between;background:var(--s1);border-radius:16px;padding:4px;margin:4px 0 14px}
+.mnav button{width:44px;height:44px;border-radius:12px;font-size:22px}
+.mnav button:active{background:var(--s2)}
+.mnav b{font-weight:600;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.mo{height:48px;border-radius:14px;background:var(--s1);border:1px solid var(--ln);font-size:14px;position:relative;text-transform:capitalize}
+.mo.on{background:var(--red);border-color:var(--red);font-weight:600}
+.mo.has::after{content:'';position:absolute;bottom:6px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--tx);opacity:.7}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:18px;padding:16px;margin-bottom:12px}
+.big{font:600 44px 'Barlow Condensed',sans-serif;line-height:1}
+.mut{color:var(--mut);font-size:13.5px}
+.pie{display:flex;align-items:center;gap:18px}
+.pie svg{width:150px;height:150px;flex:none}
+.lg{flex:1;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.lg div{display:flex;align-items:center;gap:8px}
+.lg i{width:10px;height:10px;border-radius:50%;flex:none}
+.lg span{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
+.day{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin:16px 2px 8px}
+.row{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--ln);border-radius:16px;padding:10px 8px 10px 14px;margin-bottom:8px}
+.row .d{width:10px;height:10px;border-radius:50%;flex:none}
+.row .i{flex:1;min-width:0}
+.row .i b{font-weight:600;font-size:15px}
+.row .i div{font-size:13px;color:var(--mut);margin-top:2px}
+.ib{height:40px;min-width:40px;padding:0 10px;border-radius:12px;background:var(--s2);font-size:13px;font-weight:500}
+.ib.del{background:#4a1618;color:#ff8d8d}
+.pri{width:100%;height:50px;border-radius:14px;background:var(--red);font-weight:600;font-size:16px;margin:8px 0}
+.sec{width:100%;height:50px;border-radius:14px;background:var(--s2);font-weight:500;font-size:16px}
+.emp{color:var(--mut);text-align:center;padding:28px 12px;font-size:14.5px;line-height:1.45}
+label.f{display:block;font-size:13px;color:var(--mut);margin:12px 0 6px}
+input.in{width:100%;height:48px;border-radius:12px;border:1px solid var(--ln);background:var(--s2);color:var(--tx);font:inherit;font-size:17px;padding:0 12px;color-scheme:dark}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dlg{align-items:center;padding:16px;z-index:20}
+.dlg .box{background:var(--s1);border:1px solid var(--ln);border-radius:22px;padding:18px;width:100%;max-width:400px;user-select:text}
+.dlg h3{margin:0 0 4px;font-size:18px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;height:44px;border-radius:12px;border:2px solid var(--c);color:var(--c);font-weight:600}
+.seg button.on{background:var(--c);color:#111}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.acts .pri,.acts .sec{margin:0}
+#toast{position:fixed;left:50%;bottom:calc(110px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:#fff;color:#111;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="depts" id="depts"></div>
+    <div class="clock"><div id="ck-t">--:--:--</div><div id="ck-d">&nbsp;</div></div>
+  </header>
+  <main class="mid">
+    <button class="go" id="go" data-a="go"><span id="go-l">START</span><span id="go-t"></span></button>
+    <p id="stat"></p>
+  </main>
+  <nav class="bot">
+    <button class="nb" data-a="open:m"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Wybór miesiąca</button>
+    <button class="nb" data-a="open:l"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Liczba godzin w miesiącu</button>
+    <button class="nb" data-a="open:e"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2c-.5-.8-1.4-1.2-2.5-1.2-1.4 0-2.5.7-2.5 1.8 0 2.6 5 1.2 5 3.8 0 1.1-1.1 1.9-2.6 1.9-1.2 0-2.2-.5-2.7-1.4M12 6.5V8m0 8v1.5"/></svg>Ile zarobiłem</button>
+  </nav>
+</div>
+<div class="ov" id="sheet" hidden><div class="panel" id="panel"></div></div>
+<div class="ov dlg" id="dlg" hidden></div>
+<div id="toast"></div>
+<script>
+const TZ='Europe/Warsaw';
+const D={bar:{n:'Bar',c:'#e5484d'},ow:{n:'Ow',c:'#f2a93b'},cafe:{n:'Cafe',c:'#3fc1b0'}};
+const MN=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
+const MG=['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+const WD=['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const F=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
+function P(ms){const o={};F.formatToParts(ms).forEach(p=>o[p.type]=p.value);return{y:+o.year,m:+o.month,d:+o.day,h:+o.hour,mi:+o.minute,s:+o.second}}
+function toMs(date,time){const[y,m,d]=date.split('-').map(Number),[h,mi]=time.split(':').map(Number),t=Date.UTC(y,m-1,d,h,mi);let g=t;for(let i=0;i<2;i++){const p=P(g);g+=t-Date.UTC(p.y,p.m-1,p.d,p.h,p.mi)}return g}
+const ymd=p=>`${p.y}-${pad(p.m)}-${pad(p.d)}`,hm=p=>`${pad(p.h)}:${pad(p.mi)}`,mk=ms=>{const p=P(ms);return`${p.y}-${pad(p.m)}`};
+const wd=p=>new Date(Date.UTC(p.y,p.m-1,p.d)).getUTCDay();
+const dur=m=>`${Math.floor(m/60)} h ${pad(m%60)} min`;
+const hrs=m=>(m/60).toFixed(1).replace('.',',')+' h';
+const zl=v=>v.toLocaleString('pl-PL',{style:'currency',currency:'PLN'});
+const mins=s=>Math.round((s.end-s.start)/6e4);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+const now0=P(Date.now());
+const S={shifts:[],active:null,dept:null,rate:now0.y>=2027?32.3:31.4,month:mk(Date.now()),year:now0.y,sheet:null,edit:null,confirm:null};
+try{const r=JSON.parse(localStorage.getItem('kino-czas')||'{}');if(r.shifts)S.shifts=r.shifts;if(r.active)S.active=r.active;if(r.dept)S.dept=r.dept;if(r.rate)S.rate=r.rate}catch(e){}
+if(S.active)S.dept=S.active.dept;
+function save(){try{localStorage.setItem('kino-czas',JSON.stringify({shifts:S.shifts,active:S.active,dept:S.dept,rate:S.rate}))}catch(e){}}
+let tt;function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2200)}
+
+function paint(){
+  $('depts').innerHTML=Object.entries(D).map(([k,v])=>`<button class="dp${S.dept===k?' on':''}" style="--c:${v.c}" data-a="dept:${k}" ${S.active&&S.active.dept!==k?'disabled':''} aria-pressed="${S.dept===k}">${v.n}</button>`).join('');
+  const g=$('go');g.classList.toggle('run',!!S.active);$('go-l').textContent=S.active?'STOP':'START';
+  $('stat').textContent=S.active?`Trwa zmiana: ${D[S.active.dept].n}, od ${hm(P(S.active.t))}`:S.dept?`Wybrany dział: ${D[S.dept].n}. Naciśnij START.`:'Wybierz dział, aby zacząć.';
+  if(!S.active)$('go-t').textContent='';
+}
+function tick(){
+  const n=Date.now(),p=P(n);
+  $('ck-t').textContent=`${pad(p.h)}:${pad(p.mi)}:${pad(p.s)}`;
+  $('ck-d').textContent=`${WD[wd(p)]}, ${p.d} ${MG[p.m-1]} ${p.y}`;
+  if(S.active){const s=Math.max(0,Math.floor((n-S.active.t)/1000));$('go-t').textContent=`${pad(Math.floor(s/3600))}:${pad(Math.floor(s/60)%60)}:${pad(s%60)}`}
+}
+function toggle(){
+  if(S.active){
+    const end=Math.floor(Date.now()/6e4)*6e4,st=Math.floor(S.active.t/6e4)*6e4;
+    if(end>st){S.shifts.push({id:uid(),dept:S.active.dept,start:st,end});S.shifts.sort((a,b)=>a.start-b.start);toast(`Zapisano: ${D[S.active.dept].n}, ${dur((end-st)/6e4)}`)}
+    else toast('Zmiana krótsza niż minuta, nie zapisano');
+    S.active=null;
+  }else{
+    if(!S.dept){const g=$('go');g.classList.remove('shake');void g.offsetWidth;g.classList.add('shake');toast('Najpierw wybierz dział');return}
+    S.active={dept:S.dept,t:Date.now()};
+  }
+  save();paint();tick();
+}
+const ms_=m=>S.shifts.filter(s=>mk(s.start)===m);
+function tot(list){const o={bar:0,ow:0,cafe:0};list.forEach(s=>o[s.dept]+=mins(s));return o}
+function mtitle(m){const[y,n]=m.split('-').map(Number);return`${MN[n-1]} ${y}`}
+function shiftMonth(d){let[y,m]=S.month.split('-').map(Number);m+=d;if(m<1){m=12;y--}if(m>12){m=1;y++}S.month=`${y}-${pad(m)}`}
+const mnav=()=>`<div class="mnav"><button data-a="mn:-1" aria-label="Poprzedni miesiąc">‹</button><b style="text-transform:capitalize">${mtitle(S.month)}</b><button data-a="mn:1" aria-label="Następny miesiąc">›</button></div>`;
+
+function pie(t){
+  const sum=t.bar+t.ow+t.cafe,C=2*Math.PI*60;let off=0,segs='';
+  if(sum)Object.keys(D).forEach(k=>{if(!t[k])return;const l=t[k]/sum*C;segs+=`<circle cx="75" cy="75" r="60" fill="none" stroke="${D[k].c}" stroke-width="26" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"/>`;off+=l});
+  return`<div class="pie"><svg viewBox="0 0 150 150" role="img" aria-label="Wykres kołowy godzin według działów"><circle cx="75" cy="75" r="60" fill="none" stroke="#202026" stroke-width="26"/>${segs}<text x="75" y="82" text-anchor="middle" fill="#f4f4f5" font-size="20" font-weight="600" font-family="Barlow Condensed,sans-serif">${hrs(sum)}</text></svg>
+  <div class="lg">${Object.keys(D).map(k=>`<div><i style="background:${D[k].c}"></i>${D[k].n}<span>${hrs(t[k])}${sum?`<br><small class="mut">${Math.round(t[k]/sum*100)}%</small>`:''}</span></div>`).join('')}</div></div>`;
+}
+function viewM(){
+  const has=new Set(S.shifts.map(s=>mk(s.start))),t=tot(ms_(S.month)),sum=t.bar+t.ow+t.cafe;
+  return`<div class="mnav"><button data-a="yr:-1" aria-label="Poprzedni rok">‹</button><b>${S.year}</b><button data-a="yr:1" aria-label="Następny rok">›</button></div>
+  <div class="grid">${MN.map((n,i)=>{const k=`${S.year}-${pad(i+1)}`;return`<button class="mo${k===S.month?' on':''}${has.has(k)?' has':''}" data-a="pm:${k}">${n.slice(0,3)}</button>`}).join('')}</div>
+  <div class="card"><div class="mut" style="text-transform:capitalize">${mtitle(S.month)}</div><div class="big" style="margin:6px 0 16px">${sum?dur(sum):'0 h'}</div>
+  ${sum?pie(t):'<div class="emp" style="padding:12px">Brak przepracowanych godzin w tym miesiącu.</div>'}</div>`;
+}
+function viewL(){
+  const list=ms_(S.month).slice().sort((a,b)=>b.start-a.start),sum=list.reduce((a,s)=>a+mins(s),0);
+  let h=mnav()+`<div class="card" style="padding:12px 16px"><span class="mut">Razem w miesiącu</span><div class="big" style="margin-top:4px">${dur(sum)}</div></div>`;
+  if(!list.length)h+=`<div class="emp">Brak zmian w tym miesiącu.<br>Zacznij pracę przyciskiem START albo dodaj zmianę ręcznie.</div>`;
+  let cur='';
+  list.forEach(s=>{const p=P(s.start),e=P(s.end),d=ymd(p);
+    if(d!==cur){cur=d;const dm=list.filter(x=>ymd(P(x.start))===d).reduce((a,x)=>a+mins(x),0);h+=`<div class="day"><span>${WD[wd(p)]}, ${p.d} ${MG[p.m-1]}</span><span>${dur(dm)}</span></div>`}
+    h+=`<div class="row"><span class="d" style="background:${D[s.dept].c}"></span><div class="i"><b>${D[s.dept].n}</b><div>${hm(p)}–${hm(e)}, ${dur(mins(s))}</div></div>
+    <button class="ib" data-a="edit:${s.id}">Edytuj</button><button class="ib del" data-a="del:${s.id}">${S.confirm===s.id?'Usunąć?':'Usuń'}</button></div>`});
+  return h+`<button class="pri" data-a="new" style="margin-top:14px">Dodaj zmianę ręcznie</button>`;
+}
+function earnOut(){
+  const t=tot(ms_(S.month)),sum=t.bar+t.ow+t.cafe;
+  return`<div class="mut" style="text-transform:capitalize">${mtitle(S.month)}</div><div class="big" style="font-size:56px;margin:6px 0">${zl(sum/60*S.rate)}</div>
+  <div class="mut">${dur(sum)} × ${zl(S.rate)}/h</div>
+  <div class="lg" style="margin-top:16px">${Object.keys(D).map(k=>`<div><i style="background:${D[k].c}"></i>${D[k].n}<span>${zl(t[k]/60*S.rate)}<br><small class="mut">${hrs(t[k])}</small></span></div>`).join('')}</div>`;
+}
+function viewE(){
+  return mnav()+`<div class="card" id="earn">${earnOut()}</div>
+  <div class="card"><label class="f" for="rate" style="margin-top:0">Stawka godzinowa (zł brutto = netto)</label>
+  <input class="in" id="rate" inputmode="decimal" value="${String(S.rate).replace('.',',')}" autocomplete="off">
+  <p class="mut" style="margin:10px 0 0;line-height:1.4">Student do 26. roku życia: netto = brutto. Minimalna stawka godzinowa: 31,40 zł w 2026 r., od 1 stycznia 2027 r. 32,30 zł.</p></div>`;
+}
+const TITLES={m:'Wybór miesiąca',l:'Godziny w miesiącu',e:'Ile zarobiłem'};
+function renderSheet(){
+  const sh=$('sheet');
+  if(!S.sheet){sh.hidden=true;return}
+  const top=$('panel').scrollTop,was=!sh.hidden;
+  $('panel').innerHTML=`<div class="ph"><h2>${TITLES[S.sheet]}</h2><button class="x" data-a="close" aria-label="Zamknij">✕</button></div>`+({m:viewM,l:viewL,e:viewE}[S.sheet])();
+  sh.hidden=false;if(was)$('panel').scrollTop=top;
+}
+function renderDlg(){
+  const e=S.edit,d=$('dlg');
+  if(!e){d.hidden=true;return}
+  d.innerHTML=`<div class="box"><h3>${e.id?'Edytuj zmianę':'Nowa zmiana'}</h3>
+  <label class="f">Dział</label><div class="seg">${Object.entries(D).map(([k,v])=>`<button class="${e.dept===k?'on':''}" style="--c:${v.c}" data-a="edept:${k}">${v.n}</button>`).join('')}</div>
+  <label class="f" for="ed-d">Data</label><input class="in" type="date" id="ed-d" value="${e.date}">
+  <div class="two"><div><label class="f" for="ed-s">Początek</label><input class="in" type="time" id="ed-s" value="${e.s}"></div><div><label class="f" for="ed-e">Koniec</label><input class="in" type="time" id="ed-e" value="${e.e}"></div></div>
+  <div class="acts"><button class="sec" data-a="cancel">Anuluj</button><button class="pri" data-a="save">Zapisz</button></div></div>`;
+  d.hidden=false;
+}
+function syncEdit(){const e=S.edit;if(!e)return;e.date=$('ed-d').value;e.s=$('ed-s').value;e.e=$('ed-e').value}
+function act(a,v){
+  if(a!=='del'&&S.confirm){S.confirm=null;if(S.sheet==='l'&&!['edit','new','close'].includes(a))renderSheet()}
+  switch(a){
+    case'dept':if(S.active)return;S.dept=S.dept===v?null:v;save();paint();break;
+    case'go':toggle();break;
+    case'open':S.sheet=v;if(v==='m')S.year=+S.month.slice(0,4);renderSheet();break;
+    case'close':S.sheet=null;renderSheet();break;
+    case'yr':S.year+=+v;renderSheet();break;
+    case'pm':S.month=v;renderSheet();break;
+    case'mn':shiftMonth(+v);renderSheet();break;
+    case'new':{const p=P(Date.now());S.edit={id:null,dept:S.dept||'bar',date:ymd(p),s:'09:00',e:'17:00'};renderDlg();break}
+    case'edit':{const s=S.shifts.find(x=>x.id===v);if(!s)return;const p=P(s.start),e=P(s.end);S.edit={id:v,dept:s.dept,date:ymd(p),s:hm(p),e:hm(e)};renderDlg();break}
+    case'edept':syncEdit();S.edit.dept=v;renderDlg();break;
+    case'cancel':S.edit=null;renderDlg();break;
+    case'save':{syncEdit();const e=S.edit;if(!e.date||!e.s||!e.e){toast('Uzupełnij datę i godziny');return}
+      const st=toMs(e.date,e.s);let en=toMs(e.date,e.e);if(en<=st)en+=864e5;
+      if(e.id){const s=S.shifts.find(x=>x.id===e.id);Object.assign(s,{dept:e.dept,start:st,end:en})}else S.shifts.push({id:uid(),dept:e.dept,start:st,end:en});
+      S.shifts.sort((a,b)=>a.start-b.start);S.month=mk(st);S.edit=null;save();renderDlg();renderSheet();toast('Zapisano');break}
+    case'del':if(S.confirm===v){S.shifts=S.shifts.filter(x=>x.id!==v);S.confirm=null;save();renderSheet();toast('Usunięto zmianę')}else{S.confirm=v;renderSheet()}break;
+  }
+}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');
+  if(el){const s=el.dataset.a,i=s.indexOf(':');act(i<0?s:s.slice(0,i),i<0?'':s.slice(i+1));return}
+  if(e.target.id==='sheet'){S.sheet=null;renderSheet()}
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='rate'){const v=parseFloat(e.target.value.replace(',','.'));S.rate=isNaN(v)||v<0?0:v;save();$('earn').innerHTML=earnOut()}
+});
+paint();tick();setInterval(tick,1000);
+</script>
+</body>
+</html>
