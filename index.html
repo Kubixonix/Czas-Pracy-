@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Czas pracy – kino</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0b">
+<meta name="theme-color" content="#0b0907">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Czas pracy">
@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
 <style>
-:root{--bg:#0a0a0b;--s1:#151518;--s2:#202026;--ln:#2b2b32;--tx:#f4f4f5;--mut:#8d8d97;--red:#d92d2d;color-scheme:dark;
+:root{--bg:#0b0907;--s1:#16120e;--s2:#221b14;--ln:#33281c;--tx:#fbf6ee;--mut:#a39a8d;--ac:#ff6a00;--grad:linear-gradient(180deg,#ffa726,#ff6a00);--ondark:#1a0d00;color-scheme:dark;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *,*::before,*::after{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -33,21 +33,21 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2
 #ck-t{font:600 26px 'Barlow Condensed',sans-serif;letter-spacing:.5px;font-variant-numeric:tabular-nums}
 #ck-d{font-size:12.5px;color:var(--mut);margin-top:1px}
 .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;min-height:0}
-.go{width:min(72vw,40vh,290px);aspect-ratio:1;border-radius:50%;border:6px solid var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:background .2s,transform .1s}
+.go{width:min(72vw,40vh,290px);aspect-ratio:1;border-radius:50%;border:6px solid var(--ac);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:background .2s,transform .1s}
 .go:active{transform:scale(.97)}
 #go-l{font:600 40px 'Barlow Condensed',sans-serif;letter-spacing:3px}
 #go-t{font:500 30px 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums;color:var(--mut);height:34px}
-.go.run{background:var(--red);animation:pulse 2.4s ease-in-out infinite}
-.go.run #go-t{color:#fff}
+.go.run{background:var(--grad);color:var(--ondark);animation:pulse 2.4s ease-in-out infinite}
+.go.run #go-t{color:var(--ondark)}
 .go.shake{animation:shake .35s}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,45,45,.5)}50%{box-shadow:0 0 0 18px rgba(217,45,45,0)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,106,0,.55)}50%{box-shadow:0 0 0 18px rgba(255,106,0,0)}}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @media(prefers-reduced-motion:reduce){.go.run,.go.shake{animation:none}.panel{animation:none!important}}
 #stat{margin:0;font-size:14.5px;color:var(--mut);text-align:center;min-height:20px}
 .bot{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .nb{background:var(--s1);border:1px solid var(--ln);border-radius:18px;min-height:88px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;line-height:1.2;text-align:center;font-weight:500}
 .nb:active{background:var(--s2)}
-.nb svg{width:26px;height:26px;fill:none;stroke:var(--red);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nb svg{width:26px;height:26px;fill:none;stroke:var(--ac);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10;display:flex;align-items:flex-end;justify-content:center}
 .ov[hidden]{display:none}
 .panel{background:var(--bg);width:100%;max-width:520px;height:92%;border-radius:24px 24px 0 0;border:1px solid var(--ln);border-bottom:0;overflow-y:auto;padding:0 16px calc(20px + env(safe-area-inset-bottom,0px));animation:up .22s ease-out;user-select:text}
@@ -61,7 +61,7 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2
 .mnav b{font-weight:600;font-size:16px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
 .mo{height:48px;border-radius:14px;background:var(--s1);border:1px solid var(--ln);font-size:14px;position:relative;text-transform:capitalize}
-.mo.on{background:var(--red);border-color:var(--red);font-weight:600}
+.mo.on{background:var(--grad);border-color:var(--ac);color:var(--ondark);font-weight:600}
 .mo.has::after{content:'';position:absolute;bottom:6px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--tx);opacity:.7}
 .card{background:var(--s1);border:1px solid var(--ln);border-radius:18px;padding:16px;margin-bottom:12px}
 .big{font:600 44px 'Barlow Condensed',sans-serif;line-height:1}
@@ -80,7 +80,7 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2
 .row .i div{font-size:13px;color:var(--mut);margin-top:2px}
 .ib{height:40px;min-width:40px;padding:0 10px;border-radius:12px;background:var(--s2);font-size:13px;font-weight:500}
 .ib.del{background:#4a1618;color:#ff8d8d}
-.pri{width:100%;height:50px;border-radius:14px;background:var(--red);font-weight:600;font-size:16px;margin:8px 0}
+.pri{width:100%;height:50px;border-radius:14px;background:var(--grad);color:var(--ondark);font-weight:600;font-size:16px;margin:8px 0}
 .sec{width:100%;height:50px;border-radius:14px;background:var(--s2);font-weight:500;font-size:16px}
 .emp{color:var(--mut);text-align:center;padding:28px 12px;font-size:14.5px;line-height:1.45}
 label.f{display:block;font-size:13px;color:var(--mut);margin:12px 0 6px}
@@ -119,7 +119,7 @@ input.in{width:100%;height:48px;border-radius:12px;border:1px solid var(--ln);ba
 <div id="toast"></div>
 <script>
 const TZ='Europe/Warsaw';
-const D={bar:{n:'Bar',c:'#e5484d'},ow:{n:'Ow',c:'#f2a93b'},cafe:{n:'Cafe',c:'#3fc1b0'}};
+const D={bar:{n:'Bar',c:'#ffb020'},ow:{n:'Ow',c:'#3bb4f2'},cafe:{n:'Cafe',c:'#f2e6d0'}};
 const MN=['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
 const MG=['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
 const WD=['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
@@ -176,7 +176,7 @@ const mnav=()=>`<div class="mnav"><button data-a="mn:-1" aria-label="Poprzedni m
 function pie(t){
   const sum=t.bar+t.ow+t.cafe,C=2*Math.PI*60;let off=0,segs='';
   if(sum)Object.keys(D).forEach(k=>{if(!t[k])return;const l=t[k]/sum*C;segs+=`<circle cx="75" cy="75" r="60" fill="none" stroke="${D[k].c}" stroke-width="26" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"/>`;off+=l});
-  return`<div class="pie"><svg viewBox="0 0 150 150" role="img" aria-label="Wykres kołowy godzin według działów"><circle cx="75" cy="75" r="60" fill="none" stroke="#202026" stroke-width="26"/>${segs}<text x="75" y="82" text-anchor="middle" fill="#f4f4f5" font-size="20" font-weight="600" font-family="Barlow Condensed,sans-serif">${hrs(sum)}</text></svg>
+  return`<div class="pie"><svg viewBox="0 0 150 150" role="img" aria-label="Wykres kołowy godzin według działów"><circle cx="75" cy="75" r="60" fill="none" stroke="#221b14" stroke-width="26"/>${segs}<text x="75" y="82" text-anchor="middle" fill="#f4f4f5" font-size="20" font-weight="600" font-family="Barlow Condensed,sans-serif">${hrs(sum)}</text></svg>
   <div class="lg">${Object.keys(D).map(k=>`<div><i style="background:${D[k].c}"></i>${D[k].n}<span>${hrs(t[k])}${sum?`<br><small class="mut">${Math.round(t[k]/sum*100)}%</small>`:''}</span></div>`).join('')}</div></div>`;
 }
 function viewM(){
