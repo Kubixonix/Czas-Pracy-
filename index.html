@@ -50,7 +50,6 @@ button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @media(prefers-reduced-motion:reduce){.go.run,.go.shake{animation:none}.panel{animation:none!important}}
 #stat{margin:0;font-size:14.5px;color:var(--tx);text-align:center;min-height:20px;text-shadow:0 1px 8px #000}
-.lnk{font-size:12.5px;color:#e2d9cc;text-decoration:underline;text-underline-offset:3px;padding:8px 12px;text-shadow:0 1px 8px #000;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bot{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .nb{background:rgba(22,18,14,.84);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--ln);border-radius:18px;min-height:88px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;line-height:1.2;text-align:center;font-weight:500}
 .nb:active{background:var(--s2)}
@@ -96,6 +95,11 @@ input.in{width:100%;height:48px;border-radius:12px;border:1px solid var(--ln);ba
 .dlg{align-items:center;padding:16px;z-index:20}
 .dlg .box{background:var(--s1);border:1px solid var(--ln);border-radius:22px;padding:18px;width:100%;max-width:400px;user-select:text}
 .dlg h3{margin:0 0 4px;font-size:18px}
+.dlg .box{max-height:100%;overflow-y:auto}
+.tri{display:flex;align-items:center;gap:6px}
+.tri span{color:var(--mut);font-size:20px}
+.in.n{text-align:center;min-width:0;padding:0 4px;flex:1}
+.set{display:block;margin:28px auto 8px;padding:10px 14px;font-size:12.5px;color:var(--mut);opacity:.75}
 .seg{display:flex;gap:8px}
 .seg button{flex:1;height:44px;border-radius:12px;border:2px solid var(--c);color:var(--c);font-weight:600}
 .seg button.on{background:var(--c);color:#111}
@@ -115,7 +119,6 @@ input.in{width:100%;height:48px;border-radius:12px;border:1px solid var(--ln);ba
   <main class="mid">
     <button class="go" id="go" data-a="go"><span id="go-l">START</span><span id="go-t"></span></button>
     <p id="stat"></p>
-    <button class="lnk" id="lnk" data-a="open:s"></button>
   </main>
   <nav class="bot">
     <button class="nb" data-a="open:m"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Wybór miesiąca</button>
@@ -193,7 +196,8 @@ function viewM(){
   return`<div class="mnav"><button data-a="yr:-1" aria-label="Poprzedni rok">‹</button><b>${S.year}</b><button data-a="yr:1" aria-label="Następny rok">›</button></div>
   <div class="grid">${MN.map((n,i)=>{const k=`${S.year}-${pad(i+1)}`;return`<button class="mo${k===S.month?' on':''}${has.has(k)?' has':''}" data-a="pm:${k}">${n.slice(0,3)}</button>`}).join('')}</div>
   <div class="card"><div class="mut" style="text-transform:capitalize">${mtitle(S.month)}</div><div class="big" style="margin:6px 0 16px">${sum?dur(sum):'0 h'}</div>
-  ${sum?pie(t):'<div class="emp" style="padding:12px">Brak przepracowanych godzin w tym miesiącu.</div>'}</div>`;
+  ${sum?pie(t):'<div class="emp" style="padding:12px">Brak przepracowanych godzin w tym miesiącu.</div>'}</div>
+  <button class="set" data-a="open:s">⚙ Tło aplikacji</button>`;
 }
 function viewL(){
   const list=ms_(S.month).slice().sort((a,b)=>b.start-a.start),sum=list.reduce((a,s)=>a+mins(s),0);
@@ -229,14 +233,17 @@ function renderSheet(){
 function renderDlg(){
   const e=S.edit,d=$('dlg');
   if(!e){d.hidden=true;return}
+  const R=e.raw,f=(id,k,ph,ml,w)=>`<input class="in n" id="${id}" value="${R[k]}" inputmode="numeric" pattern="[0-9]*" maxlength="${ml}" placeholder="${ph}" aria-label="${ph}" autocomplete="off"${w?` style="flex:${w}"`:''}>`;
   d.innerHTML=`<div class="box"><h3>${e.id?'Edytuj zmianę':'Nowa zmiana'}</h3>
   <label class="f">Dział</label><div class="seg">${Object.entries(D).map(([k,v])=>`<button class="${e.dept===k?'on':''}" style="--c:${v.c}" data-a="edept:${k}">${v.n}</button>`).join('')}</div>
-  <label class="f" for="ed-d">Data</label><input class="in" type="date" id="ed-d" value="${e.date}">
-  <div class="two"><div><label class="f" for="ed-s">Początek</label><input class="in" type="time" id="ed-s" value="${e.s}"></div><div><label class="f" for="ed-e">Koniec</label><input class="in" type="time" id="ed-e" value="${e.e}"></div></div>
+  <label class="f">Data (dzień, miesiąc, rok)</label>
+  <div class="tri">${f('ed-dd','dd','DD',2)}<span>.</span>${f('ed-mm','mm','MM',2)}<span>.</span>${f('ed-yy','yy','RRRR',4,1.7)}</div>
+  <div class="two"><div><label class="f">Początek (godz : min)</label><div class="tri">${f('ed-sh','sh','GG',2)}<span>:</span>${f('ed-sm','sm','MM',2)}</div></div>
+  <div><label class="f">Koniec (godz : min)</label><div class="tri">${f('ed-eh','eh','GG',2)}<span>:</span>${f('ed-em','em','MM',2)}</div></div></div>
   <div class="acts"><button class="sec" data-a="cancel">Anuluj</button><button class="pri" data-a="save">Zapisz</button></div></div>`;
   d.hidden=false;
 }
-function syncEdit(){const e=S.edit;if(!e)return;e.date=$('ed-d').value;e.s=$('ed-s').value;e.e=$('ed-e').value}
+function syncEdit(){const e=S.edit;if(!e)return;const g=id=>$(id).value.trim();e.raw={dd:g('ed-dd'),mm:g('ed-mm'),yy:g('ed-yy'),sh:g('ed-sh'),sm:g('ed-sm'),eh:g('ed-eh'),em:g('ed-em')}}
 function act(a,v){
   if(a!=='del'&&S.confirm){S.confirm=null;if(S.sheet==='l'&&!['edit','new','close'].includes(a))renderSheet()}
   switch(a){
@@ -247,17 +254,19 @@ function act(a,v){
     case'yr':S.year+=+v;renderSheet();break;
     case'pm':S.month=v;renderSheet();break;
     case'mn':shiftMonth(+v);renderSheet();break;
-    case'new':{const p=P(Date.now());S.edit={id:null,dept:S.dept||'bar',date:ymd(p),s:'09:00',e:'17:00'};renderDlg();break}
-    case'edit':{const s=S.shifts.find(x=>x.id===v);if(!s)return;const p=P(s.start),e=P(s.end);S.edit={id:v,dept:s.dept,date:ymd(p),s:hm(p),e:hm(e)};renderDlg();break}
+    case'new':{const p=P(Date.now());S.edit={id:null,dept:S.dept||'bar',raw:{dd:pad(p.d),mm:pad(p.m),yy:String(p.y),sh:'09',sm:'00',eh:'17',em:'00'}};renderDlg();break}
+    case'edit':{const s=S.shifts.find(x=>x.id===v);if(!s)return;const p=P(s.start),e=P(s.end);S.edit={id:v,dept:s.dept,raw:{dd:pad(p.d),mm:pad(p.m),yy:String(p.y),sh:pad(p.h),sm:pad(p.mi),eh:pad(e.h),em:pad(e.mi)}};renderDlg();break}
     case'edept':syncEdit();S.edit.dept=v;renderDlg();break;
     case'cancel':S.edit=null;renderDlg();break;
-    case'save':{syncEdit();const e=S.edit;if(!e.date||!e.s||!e.e){toast('Uzupełnij datę i godziny');return}
-      const st=toMs(e.date,e.s);let en=toMs(e.date,e.e);if(en<=st)en+=864e5;
+    case'save':{syncEdit();const e=S.edit,r=e.raw;
+      const ok=Object.values(r).every(v=>/^\d+$/.test(v)),d=+r.dd,m=+r.mm,y=+r.yy,sh=+r.sh,sm=+r.sm,eh=+r.eh,em=+r.em,dt=new Date(Date.UTC(y,m-1,d));
+      if(!ok||y<2000||y>2100||dt.getUTCDate()!==d||dt.getUTCMonth()!==m-1||sh>23||eh>23||sm>59||em>59){toast('Sprawdź datę i godziny');return}
+      const date=`${y}-${pad(m)}-${pad(d)}`,st=toMs(date,`${pad(sh)}:${pad(sm)}`);let en=toMs(date,`${pad(eh)}:${pad(em)}`);if(en<=st)en+=864e5;
       if(e.id){const s=S.shifts.find(x=>x.id===e.id);Object.assign(s,{dept:e.dept,start:st,end:en})}else S.shifts.push({id:uid(),dept:e.dept,start:st,end:en});
       S.shifts.sort((a,b)=>a.start-b.start);S.month=mk(st);S.edit=null;save();renderDlg();renderSheet();toast('Zapisano');break}
     case'tsave':{const v=$('tk').value.trim();if(!v){$('tmsg').textContent='Najpierw wklej klucz.';return}S.tmdb=v;try{localStorage.setItem('kino-tmdb',v)}catch(e){}$('tmsg').textContent='Pobieram plakat…';
       refreshFilm(true).then(()=>{renderSheet();$('tmsg').textContent='Gotowe, plakat ustawiony.'}).catch(()=>{$('tmsg').textContent='Nie udało się. Sprawdź klucz i połączenie z internetem.'});break}
-    case'tclear':S.tmdb='';S.film=null;try{localStorage.removeItem('kino-tmdb');localStorage.removeItem('kino-bg')}catch(e){}$('bgp').classList.remove('on');setLnk();renderSheet();break;
+    case'tclear':S.tmdb='';S.film=null;try{localStorage.removeItem('kino-tmdb');localStorage.removeItem('kino-bg')}catch(e){}$('bgp').classList.remove('on');renderSheet();break;
     case'del':if(S.confirm===v){S.shifts=S.shifts.filter(x=>x.id!==v);S.confirm=null;save();renderSheet();toast('Usunięto zmianę')}else{S.confirm=v;renderSheet()}break;
   }
 }
@@ -266,6 +275,8 @@ document.addEventListener('click',e=>{
   if(el){const s=el.dataset.a,i=s.indexOf(':');act(i<0?s:s.slice(0,i),i<0?'':s.slice(i+1));return}
   if(e.target.id==='sheet'){S.sheet=null;renderSheet()}
 });
+document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('n'))setTimeout(()=>e.target.select(),0)});
+document.addEventListener('focusout',e=>{const t=e.target;if(t.classList&&t.classList.contains('n')&&t.id!=='ed-yy'&&/^\d$/.test(t.value))t.value='0'+t.value});
 document.addEventListener('input',e=>{
   if(e.target.id==='rate'){const v=parseFloat(e.target.value.replace(',','.'));S.rate=isNaN(v)||v<0?0:v;save();$('earn').innerHTML=earnOut()}
 });
@@ -273,7 +284,6 @@ try{S.tmdb=localStorage.getItem('kino-tmdb')||'';S.film=JSON.parse(localStorage.
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function addDays(ds,n){const[y,m,d]=ds.split('-').map(Number),t=new Date(Date.UTC(y,m-1,d)+n*864e5);return`${t.getUTCFullYear()}-${pad(t.getUTCMonth()+1)}-${pad(t.getUTCDate())}`}
 function weekStart(){const p=P(Date.now()),back=(new Date(Date.UTC(p.y,p.m-1,p.d)).getUTCDay()-4+7)%7;return addDays(ymd(p),-back)}
-function setLnk(){$('lnk').textContent=S.film?`Plakat tygodnia: ${S.film.title}`:'Włącz tło z plakatem tygodnia'}
 function showBg(){if(!S.film)return;const u='https://image.tmdb.org/t/p/w780'+S.film.poster,im=new Image();im.onload=()=>{const b=$('bgp');b.style.backgroundImage=`url(${u})`;b.classList.add('on')};im.src=u}
 async function tm(path,params){const q=new URLSearchParams({language:'pl-PL',...params}),hd={};if(S.tmdb.startsWith('eyJ'))hd.Authorization='Bearer '+S.tmdb;else q.set('api_key',S.tmdb);
   const r=await fetch('https://api.themoviedb.org/3'+path+'?'+q,{headers:hd});if(!r.ok)throw new Error(r.status);return r.json()}
@@ -284,7 +294,7 @@ async function refreshFilm(force){
   if(!f){r=await tm('/movie/now_playing',{region:'PL'});f=(r.results||[]).filter(x=>x.poster_path).sort((a,b)=>b.popularity-a.popularity)[0]}
   if(!f)throw new Error('brak');
   S.film={id:f.id,title:f.title,poster:f.poster_path,week:ws};try{localStorage.setItem('kino-bg',JSON.stringify(S.film))}catch(e){}
-  setLnk();showBg();
+  showBg();
 }
 function viewS(){
   return`<div class="card"><div class="mut">Plakat tygodnia</div><div class="big" style="font-size:30px;margin-top:6px">${S.film?esc(S.film.title):'brak'}</div>
@@ -296,7 +306,7 @@ function viewS(){
   ${S.tmdb?'<button class="sec" data-a="tclear" style="margin-top:8px">Wyłącz plakat i usuń klucz</button>':''}</div>
   <div class="card mut" style="line-height:1.5"><b style="color:var(--tx)">Jak zdobyć klucz (raz, za darmo)</b><br>1. Załóż konto na themoviedb.org.<br>2. Ustawienia konta → API → utwórz klucz (typ: Developer).<br>3. Skopiuj „API Read Access Token” i wklej powyżej.<br><br>This product uses the TMDB API but is not endorsed or certified by TMDB.</div>`;
 }
-paint();tick();setInterval(tick,1000);setLnk();showBg();refreshFilm(false).catch(()=>{});
+paint();tick();setInterval(tick,1000);showBg();refreshFilm(false).catch(()=>{});
 </script>
 </body>
 </html>
